@@ -163,6 +163,103 @@ function findBestMatch(taskDescription, db) {
   };
 }
 
+// ── Trust-Weighted Matching ──────────────────────────────────────────────
+
+function findBestMatchWeighted(taskDescription, db, trustDb) {
+  const desc = taskDescription.toLowerCase();
+  let bestTemplate = null;
+  let bestTemplateKey = null;
+  let bestSimilarity = 0;
+
+  // Match against task templates (same as normal matching)
+  for (const [key, tmpl] of Object.entries(db.task_templates)) {
+    const sim = computeSimilarity(taskDescription, key);
+    if (sim > bestSimilarity) {
+      bestSimilarity = sim;
+      bestTemplate = tmpl;
+      bestTemplateKey = key;
+    }
+  }
+
+  // Match against past evaluations
+  const relevantEvals = db.evaluations
+    .filter(e => computeSimilarity(desc, e.task_type) > 0.3);
+
+  // Get trust-weighted recommendations
+  const taskType = bestTemplateKey || (relevantEvals.length > 0 ? relevantEvals[0].task_type : '');
+  const weightedRecs = getWeightedRecommendations(taskType, relevantEvals, trustDb);
+
+  // Also calculate model stats (unweighted) for comparison
+  const modelScores = {};
+  for (const e of relevantEvals) {
+    if (!modelScores[e.model]) modelScores[e.model] = { total: 0, count: 0, successes: 0, truncations: 0 };
+    modelScores[e.model].total += e.quality;
+    modelScores[e.model].count += 1;
+    if (e.success) modelScores[e.model].successes += 1;
+    if (e.truncated) modelScores[e.model].truncations += 1;
+  }
+
+  const modelStats = Object.entries(modelScores)
+    .map(([model, stats]) => ({
+      model,
+      avgQuality: +(stats.total / stats.count).toFixed(2),
+      successRate: +(stats.successes / stats.count).toFixed(2),
+      truncationRate: +(stats.truncations / stats.count).toFixed(2),
+      observations: stats.count,
+    }))
+    .sort((a, b) => b.avgQuality - a.avgQuality);
+
+  // Pick the best from weighted recommendations
+  const bestWeighted = weightedRecs[0];
+  const recommended = bestTemplate || {
+    recommended_model: bestWeighted?.model || modelStats[0]?.model || 'deepseek/deepseek-v4-flash',
+    prompt_prefix: '',
+    temperature: 0.5,
+    fallbacks: [],
+  };
+
+  // Attach model-specific warnings
+  const modelWarnings = {};
+  for (const model of (modelStats || []).map(s => s.model)) {
+    if (db.warnings[model]) modelWarnings[model] = db.warnings[model];
+  }
+
+  const confidence = +(bestSimilarity * 0.3 + (bestWeighted ? Math.min(bestWeighted.weighted_quality / 5, 0.7) : 0)).toFixed(2);
+
+  return {
+    recommended_model: recommended.recommended_model,
+    confidence,
+    trust_weighted: true,
+    prompt_prefix: recommended.prompt_prefix || '',
+    temperature: recommended.temperature ?? 0.5,
+    max_tokens: recommended.max_tokens || 4000,
+    fallback: (recommended.fallbacks || [])[0] || null,
+    model_stats: modelStats.slice(0, 5),
+    trust_ranked: weightedRecs.slice(0, 5),
+    warnings: modelWarnings,
+    matched_template: bestTemplateKey,
+    evaluation_count: relevantEvals.length,
+  };
+}
+
+// ── Template Updater ─────────────────────────────────────────────────────
+
+function updateEvaluationsWithContributors() {
+  const db = loadDatabase();
+  let updated = 0;
+  for (const e of db.evaluations) {
+    if (!e.contributor) {
+      e.contributor = 'oracle1@fleet';
+      updated++;
+    }
+  }
+  if (updated > 0) {
+    saveDatabase(db);
+    console.error(`Updated ${updated} evaluations with contributor field`);
+  }
+  return updated;
+}
+
 // ── Signature Analysis ────────────────────────────────────────────────────
 
 function analyzeSignature(text) {
@@ -247,6 +344,11 @@ class CastingCallServer {
                 type: 'string',
                 description: 'Describe the task you need a model for',
               },
+              trust_weighted: {
+                type: 'boolean',
+                description: 'Whether to use trust-weighted recommendations',
+                default: false,
+              },
             },
             required: ['task_description'],
           },
@@ -288,6 +390,10 @@ class CastingCallServer {
                 type: 'string',
                 description: 'Any additional notes',
               },
+              contributor: {
+                type: 'string',
+                description: 'Contributor identity (defaults to git config user)',
+              },
             },
             required: ['model', 'task_type', 'success', 'quality'],
           },
@@ -316,6 +422,7 @@ class CastingCallServer {
                     success: { type: 'boolean' },
                     truncated: { type: 'boolean', default: false },
                     notes: { type: 'string' },
+                    contributor: { type: 'string', description: 'Contributor identity per model result' },
                   },
                   required: ['model', 'quality', 'success'],
                 },
@@ -419,14 +526,29 @@ class CastingCallServer {
 
   handleCastModel(args) {
     const db = loadDatabase();
-    const result = findBestMatch(args.task_description, db);
+    const trustDb = loadTrustDB();
 
-    if (result.matched_template) {
-      result.match_type = 'template';
-    } else if (result.evaluation_count > 0) {
-      result.match_type = 'historical';
+    // Try fleet sync (best-effort)
+    try {
+      syncWithFleet();
+    } catch { /* federation is best-effort */ }
+
+    // Reload after sync
+    const freshDb = loadDatabase();
+
+    let result;
+    if (args.trust_weighted) {
+      result = findBestMatchWeighted(args.task_description, freshDb, trustDb);
+      result.match_type = 'trust_weighted';
     } else {
-      result.match_type = 'default';
+      result = findBestMatch(args.task_description, freshDb);
+      if (result.matched_template) {
+        result.match_type = 'template';
+      } else if (result.evaluation_count > 0) {
+        result.match_type = 'historical';
+      } else {
+        result.match_type = 'default';
+      }
     }
 
     return {
@@ -437,7 +559,10 @@ class CastingCallServer {
   handleLogResult(args) {
     const db = loadDatabase();
 
-    db.evaluations.push({
+    // Get contributor identity from git config
+    const identity = getGitIdentity();
+
+    const evaluation = {
       model: args.model,
       task_type: args.task_type,
       task_length: args.task_length || null,
@@ -446,26 +571,43 @@ class CastingCallServer {
       truncated: args.truncated || false,
       tokens_used: args.tokens_used || null,
       notes: args.notes || '',
+      contributor: args.contributor || identity.contributor,
       date: new Date().toISOString().split('T')[0],
-    });
+    };
 
-    // If the model is highly reliable for this task type, update the template
-    if (args.quality >= 4 && args.success) {
-      // Auto-update template confidence
-    }
+    // Sync with fleet before writing (get latest)
+    try {
+      syncWithFleet();
+    } catch { /* best-effort */ }
 
-    saveDatabase(db);
+    // Reload after sync and add our evaluation
+    const syncedDb = loadDatabase();
+    syncedDb.evaluations.push(evaluation);
+    saveDatabase(syncedDb);
+
+    // Commit and push to fleet (best-effort)
+    try {
+      federationPush(evaluation);
+    } catch { /* best-effort */ }
 
     return {
-      content: [{ type: 'text', text: JSON.stringify({ status: 'logged', total: db.evaluations.length }, null, 2) }],
+      content: [{ type: 'text', text: JSON.stringify({ status: 'logged', total: syncedDb.evaluations.length, contributor: evaluation.contributor }, null, 2) }],
     };
   }
 
   handleEvaluateModels(args) {
     const db = loadDatabase();
+    const identity = getGitIdentity();
+
+    // Sync with fleet before writing
+    try {
+      syncWithFleet();
+    } catch { /* best-effort */ }
+
+    const syncedDb = loadDatabase();
 
     for (const r of args.results) {
-      db.evaluations.push({
+      syncedDb.evaluations.push({
         model: r.model,
         task_type: args.task_type,
         task_length: args.task_length || null,
@@ -473,14 +615,20 @@ class CastingCallServer {
         quality: r.quality,
         truncated: r.truncated || false,
         notes: r.notes || '',
+        contributor: r.contributor || identity.contributor,
         date: new Date().toISOString().split('T')[0],
       });
     }
 
-    saveDatabase(db);
+    saveDatabase(syncedDb);
+
+    // Commit and push to fleet
+    try {
+      federationPush({ model: args.task_type, task_type: 'multi-model' });
+    } catch { /* best-effort */ }
 
     return {
-      content: [{ type: 'text', text: JSON.stringify({ status: 'logged', total: db.evaluations.length, models: args.results.length }, null, 2) }],
+      content: [{ type: 'text', text: JSON.stringify({ status: 'logged', total: syncedDb.evaluations.length, models: args.results.length }, null, 2) }],
     };
   }
 
@@ -493,6 +641,7 @@ class CastingCallServer {
 
   handleGetStats() {
     const db = loadDatabase();
+    const trustDb = loadTrustDB();
 
     const modelStats = {};
     for (const e of db.evaluations) {
@@ -509,12 +658,20 @@ class CastingCallServer {
       observations: stats.count,
     })).sort((a, b) => b.observations - a.observations);
 
+    // Count contributors in evaluations
+    const contributors = new Set(db.evaluations.map(e => e.contributor).filter(Boolean));
+
     return {
       content: [{ type: 'text', text: JSON.stringify({
         total_evaluations: db.evaluations.length,
         total_templates: Object.keys(db.task_templates).length,
         models_tracked: models.length,
         models,
+        federation: {
+          contributors: contributors.size,
+          trust_entries: Object.keys(trustDb.contributors).length,
+          default_trust: trustDb.default_trust,
+        },
         warnings: db.warnings,
       }, null, 2) }],
     };
@@ -549,6 +706,23 @@ class CastingCallServer {
 
 import { createInterface } from 'node:readline';
 
+import {
+  loadTrustDB,
+  saveTrustDB,
+  getTrustWeight,
+  getWeightedRecommendations,
+  listContributors,
+  setGlobalTrust,
+  setTaskTrust,
+  formatTrustList,
+} from './trust.mjs';
+
+import {
+  syncWithFleet,
+  getGitIdentity,
+  commitAndPush as federationPush,
+} from './federation.mjs';
+
 const args = process.argv.slice(2);
 const [cmd, ...rest] = args;
 
@@ -558,24 +732,42 @@ function runCLI(command, restArgs) {
 Casting-Call MCP — Model casting database
 
 Usage:
-  casting-call-mcp                     Start MCP server (stdio transport)
-  casting-call-mcp query "<task>"      Query for best model
-  casting-call-mcp add                  Add to database (interactive)
-  casting-call-mcp log                  Log a result (interactive)
-  casting-call-mcp stats                Show database statistics
+  casting-call-mcp                         Start MCP server (stdio transport)
+  casting-call-mcp query "<task>"           Query for best model
+  casting-call-mcp query "<task>" --trust   Query with trust-weighted recommendations
+  casting-call-mcp add                       Add to database (interactive)
+  casting-call-mcp log                       Log a result (interactive)
+  casting-call-mcp stats                     Show database statistics
+  casting-call-mcp trust list                List contributors with trust scores
+  casting-call-mcp trust set --contributor "<c>" --global <score>
+  casting-call-mcp trust set --contributor "<c>" --task "<t>" --score <s>
+  casting-call-mcp update-templates          Add contributor field to existing evaluations
+  casting-call-mcp sync                      Force sync with fleet via git
 
 Examples:
   casting-call-mcp query "rust constraint solver"
-  casting-call-mcp stats
+  casting-call-mcp query "rust constraint solver" --trust
+  casting-call-mcp trust list
+  casting-call-mcp trust set --contributor "oracle1@fleet" --global 0.85
+  casting-call-mcp trust set --contributor "forgemaster@fleet" --task "rust_code" --score 1.0
+  casting-call-mcp update-templates
 `);
     process.exit(0);
   }
 
   if (command === 'query') {
+    const trustWeighted = restArgs.includes('--trust') || restArgs.includes('--trust-weighted');
+    const task = restArgs.filter(a => !a.startsWith('--')).join(' ') || 'default';
     const db = loadDatabase();
-    const task = restArgs.join(' ') || 'default';
-    const result = findBestMatch(task, db);
-    console.log(JSON.stringify(result, null, 2));
+
+    if (trustWeighted) {
+      const trustDb = loadTrustDB();
+      const result = findBestMatchWeighted(task, db, trustDb);
+      console.log(JSON.stringify(result, null, 2));
+    } else {
+      const result = findBestMatch(task, db);
+      console.log(JSON.stringify(result, null, 2));
+    }
     process.exit(0);
   }
 
@@ -606,7 +798,8 @@ Examples:
 
   if (command === 'log') {
     const rl = createInterface({ input: process.stdin, output: process.stdout });
-    console.log('Log a task result:');
+    const identity = getGitIdentity();
+    console.log('Log a task result (git author: ' + identity.contributor + '):');
     rl.question('  Model: ', (model) => {
       rl.question('  Task type: ', (taskType) => {
         rl.question('  Success (true/false): ', (success) => {
@@ -619,10 +812,13 @@ Examples:
                 success: success === 'true',
                 quality: parseFloat(quality),
                 notes: notes || '',
+                contributor: identity.contributor,
                 date: new Date().toISOString().split('T')[0],
               });
               saveDatabase(db);
-              console.log('Result logged for ' + model + ' on ' + taskType + '.');
+              // Best-effort push to fleet
+              try { federationPush({ model, task_type: taskType }); } catch {}
+              console.log('Result logged for ' + model + ' on ' + taskType + ' as ' + identity.contributor + '.');
               rl.close();
               process.exit(0);
             });
@@ -635,6 +831,7 @@ Examples:
 
   if (command === 'stats') {
     const db = loadDatabase();
+    const trustDb = loadTrustDB();
     const modelStats = {};
     for (const e of db.evaluations) {
       if (!modelStats[e.model]) modelStats[e.model] = { count: 0, total: 0, succ: 0 };
@@ -645,6 +842,8 @@ Examples:
     console.log(JSON.stringify({
       total_evaluations: db.evaluations.length,
       total_templates: Object.keys(db.task_templates).length,
+      total_contributors: Object.keys(trustDb.contributors).length,
+      default_trust: trustDb.default_trust,
       models: Object.entries(modelStats).map(([m, s]) => ({
         model: m,
         avgQuality: +(s.total / s.count).toFixed(2),
@@ -652,6 +851,82 @@ Examples:
         observations: s.count,
       })).sort((a, b) => b.observations - a.observations),
     }, null, 2));
+    process.exit(0);
+  }
+
+  // ── Trust Commands ──────────────────────────────────────────────────
+
+  if (command === 'trust') {
+    const subCmd = restArgs[0];
+
+    if (subCmd === 'list') {
+      const trustDb = loadTrustDB();
+      console.log(formatTrustList(trustDb));
+      process.exit(0);
+    }
+
+    if (subCmd === 'set') {
+      const args = restArgs.slice(1);
+      let contributor = '';
+      let globalScore = null;
+      let taskType = null;
+      let taskScore = null;
+
+      for (let i = 0; i < args.length; i++) {
+        if (args[i] === '--contributor') contributor = args[++i] || '';
+        if (args[i] === '--global') globalScore = parseFloat(args[++i]);
+        if (args[i] === '--task') taskType = args[++i] || '';
+        if (args[i] === '--score') taskScore = parseFloat(args[++i]);
+      }
+
+      if (!contributor) {
+        console.error('Error: --contributor is required');
+        process.exit(1);
+      }
+
+      if (globalScore !== null && taskType !== null) {
+        console.error('Error: Use --global OR --task, not both in one command');
+        process.exit(1);
+      }
+
+      if (globalScore !== null) {
+        const result = setGlobalTrust(contributor, globalScore);
+        console.log('Set trust for ' + result.contributor + ' → ' + result.global_trust);
+        try { federationPush(); } catch {}
+        process.exit(0);
+      }
+
+      if (taskType !== null && taskScore !== null) {
+        const result = setTaskTrust(contributor, taskType, taskScore);
+        console.log('Set task trust for ' + result.contributor + ' on ' + result.task + ' → ' + result.score);
+        try { federationPush(); } catch {}
+        process.exit(0);
+      }
+
+      console.error('Error: Provide --global <score> or --task <type> --score <score>');
+      process.exit(1);
+    }
+
+    console.log('Unknown trust subcommand: ' + subCmd);
+    console.log('Try: casting-call-mcp trust list');
+    console.log('Try: casting-call-mcp trust set --contributor "x" --global 0.9');
+    process.exit(1);
+  }
+
+  // ── Update Templates (add contributor to existing data) ────────────
+
+  if (command === 'update-templates') {
+    const updated = updateEvaluationsWithContributors();
+    console.log('Update complete: ' + updated + ' evaluations updated with contributor field.');
+    process.exit(0);
+  }
+
+  // ── Federation Sync ─────────────────────────────────────────────────
+
+  if (command === 'sync') {
+    console.log('Syncing with fleet via git...');
+    const result = syncWithFleet();
+    console.log('Sync result: ' + JSON.stringify({ pulled: result.pulled, total: result.totalEvaluations }, null, 2));
     process.exit(0);
   }
 
