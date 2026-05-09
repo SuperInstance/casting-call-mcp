@@ -1,0 +1,5 @@
+.keys/
+*.log
+.env
+node_modules/
+data/cast-log.lock

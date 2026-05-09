@@ -1,0 +1,28 @@
+{
+  "name": "casting-call-mcp",
+  "version": "0.1.0",
+  "description": "MCP server: consultative database for model casting decisions",
+  "type": "module",
+  "main": "src/index.mjs",
+  "bin": {
+    "casting-call-mcp": "./src/index.mjs"
+  },
+  "scripts": {
+    "start": "node src/index.mjs",
+    "dev": "node --watch src/index.mjs",
+    "query": "node src/cli.mjs query",
+    "add": "node src/cli.mjs add",
+    "log": "node src/cli.mjs log"
+  },
+  "dependencies": {
+    "@modelcontextprotocol/sdk": "^1.29.0"
+  },
+  "keywords": [
+    "mcp",
+    "model-casting",
+    "ai",
+    "llm",
+    "model-selection"
+  ],
+  "license": "MIT"
+}

@@ -1,0 +1,605 @@
+{
+  "evaluations": [
+    {
+      "model": "Claude Opus (via Claude Code)",
+      "task_type": "strategic_5-action_plan,_guard_dsl_design,_llvm_backend,_coq",
+      "date": "2026-05-03",
+      "success": true,
+      "quality": 5.0,
+      "truncated": false,
+      "notes": "Rate limits are severe (~hours between calls). Best used for high-value single-shot tasks (SystemVerilog, papers, synthesis docs). Queued tasks: `/tmp/claude-smartcrdt-prompt.txt`, `/tmp/claude-synthesis-output.txt`."
+    },
+    {
+      "model": "Kimi CLI",
+      "task_type": "fixed_benchmark_csp.c_(posix,_92_queens_\u2705),_fixed_plato_migr",
+      "date": "2026-05-03",
+      "success": true,
+      "quality": 4.0,
+      "truncated": false,
+      "notes": "~100 words max with `--quiet` mode constraint."
+    },
+    {
+      "model": "Nemotron",
+      "task_type": "do-178c_certification_path_analysis,_quantum-csp_connection",
+      "date": "2026-05-03",
+      "success": true,
+      "quality": 4.0,
+      "truncated": false,
+      "notes": "Part of the 6-model round 1 strategic synthesis."
+    },
+    {
+      "model": "Seed2.0Pro",
+      "task_type": "do-254_real_vivado_numbers,_tutor-crdt_merge_pipeline,_fpga_",
+      "date": "2026-05-03",
+      "success": true,
+      "quality": 5.0,
+      "truncated": false,
+      "notes": "Used in 3 rounds. Density breakthrough: 22nm FDSOI \u2192 103B ternary params, ~3.57 Gbits/mm\u00b2."
+    },
+    {
+      "model": "Seed2.0Code",
+      "task_type": "bhcsp_framework,_plato_constraint_store_rust_impl,_guard-to-",
+      "date": "2026-05-03",
+      "success": false,
+      "quality": 4.0,
+      "truncated": false,
+      "notes": "Handles complex multi-file code generation well. Cannot generate SystemVerilog reliably."
+    },
+    {
+      "model": "Seed2.0Mini",
+      "task_type": "safety_auditor_role,_dsl_design,_safety\u2192agentic_gtm,_securit",
+      "date": "2026-05-03",
+      "success": true,
+      "quality": 4.0,
+      "truncated": false,
+      "notes": "Casey directive: Seed-2.0-mini is a \"champion\". Used for: code generation, file writing, research, documentation, creative content."
+    },
+    {
+      "model": "GLM5.1",
+      "task_type": "compiler_ir_pipeline,_risc-v_xconstr_(9_custom_instructions)",
+      "date": "2026-05-03",
+      "success": false,
+      "quality": 3.0,
+      "truncated": false,
+      "notes": "Second attempt at SystemVerilog also failed. Shared limitation with Seed-2.0-Code \u2014 neither model can produce valid SV."
+    },
+    {
+      "model": "DeepSeek Reasoner/v4pro",
+      "task_type": "p2_invariant_proof,_holonomy_snap_resolution,_6-instruction_",
+      "date": "2026-05-03",
+      "success": false,
+      "quality": 5.0,
+      "truncated": false,
+      "notes": "Self-corrected equality count mid-proof (normal). 7 compiler theorems proven with full AVX-512 assembly. TUTOR-Mask NP-hardness ran out of output budget."
+    },
+    {
+      "model": "DeepSeek Chat/v4chat",
+      "task_type": "self-improvement_without_ml_(natural_selection_of_constraint",
+      "date": "2026-05-03",
+      "success": true,
+      "quality": 4.0,
+      "truncated": false,
+      "notes": "Treat as fast coding agent, reserve reasoner for deep proofs."
+    },
+    {
+      "model": "Hermes405B",
+      "task_type": "berry_phase_analogy_(most_novel_math_contribution),_do-254_e",
+      "date": "2026-05-03",
+      "success": true,
+      "quality": 5.0,
+      "truncated": false,
+      "notes": "Semantic gap proof (for finite output domains, bit-level enforcement = semantic safety) was a key theoretical result. Lighter proof verification confirmed soundness."
+    },
+    {
+      "model": "Qwen397B",
+      "task_type": "novelty_scores_(bitmaskdomain_4/10,_isa_7/10,_coq-fpga_8/10)",
+      "date": "2026-05-03",
+      "success": true,
+      "quality": 4.5,
+      "truncated": false,
+      "notes": "Independent proof verification confirmed DeepSeek's results. Patent claims analysis produced 3 inventions with 5 claims each."
+    },
+    {
+      "model": "Qwen235B",
+      "task_type": "pldi_review_(weak_reject_\u2192_target_emsoft),_tutor_agent_desig",
+      "date": "2026-05-03",
+      "success": false,
+      "quality": 3.5,
+      "truncated": false,
+      "notes": "PLDI review correctly identified EMSOFT as better target. API issue persisting."
+    },
+    {
+      "model": "Qwen3.635B",
+      "task_type": "fabep_protocol_design_(5-layer_bytecode_exchange,_210\u03bcs_late",
+      "date": "2026-05-03",
+      "success": true,
+      "quality": 3.5,
+      "truncated": false,
+      "notes": "Smaller model but capable of focused deep work on well-scoped problems."
+    },
+    {
+      "model": "Gemma426B",
+      "task_type": "critical_assessment_(novelty_9/10,_feasibility_6/10,_impact_",
+      "date": "2026-05-03",
+      "success": true,
+      "quality": 4.0,
+      "truncated": false,
+      "notes": "Rated novelty 9/10, feasibility 6/10, impact 9/10 \u2014 matches internal assessment."
+    },
+    {
+      "model": "Hermes70B",
+      "task_type": "devil's_advocate_(attacked_7_claims,_found_4_high-risk_areas",
+      "date": "2026-05-03",
+      "success": true,
+      "quality": 4.5,
+      "truncated": false,
+      "notes": "Honest assessment: 4/10 claims survive unchanged, 3 need caveats, 2 need redesign, 1 is marketing. Conflict resolution design integrated into GUARD DSL spec."
+    },
+    {
+      "model": "MythoMaxL213b",
+      "task_type": "10_uncomfortable_socratic_questions,_secure_voting_/_laws-as",
+      "date": "2026-05-03",
+      "success": true,
+      "quality": 3.5,
+      "truncated": false,
+      "notes": "Socratic questions identified real blind spots. Inversion round useful for strategic reframing."
+    },
+    {
+      "model": "Forgemaster Direct (DeepSeekv4Flash)",
+      "task_type": "orchestration,_strategic_synthesis,_tool_use,_debate_partici",
+      "date": "2026-05-03",
+      "success": true,
+      "quality": 4.0,
+      "truncated": false,
+      "notes": "Default deepseek-v4-flash remains effective for orchestration. Not for heavy coding \u2014 delegate to paid agents."
+    },
+    {
+      "model": "Kimi",
+      "task_type": "10-mission_swarm_(attack_surface,_248_guard_constraints,_ems",
+      "date": "2026-05-04",
+      "success": true,
+      "quality": 5.0,
+      "truncated": false,
+      "notes": "PLATO's time-sharing = GPU warp scheduling analogy from Round 2. 43\u219251 opcode extension endorsed by Kimi. Swarm mode ideal for broad-coverage tasks."
+    },
+    {
+      "model": "Claude Code",
+      "task_type": "forgemaster_shell_v1.0_critique,_strategic_synthesis,_event-",
+      "date": "2026-05-04",
+      "success": true,
+      "quality": 4.0,
+      "truncated": false,
+      "notes": "Critiques were actionable and well-founded. Shell v1.1 significantly improved."
+    },
+    {
+      "model": "DeepSeek Reasoner",
+      "task_type": "7_theorems_with_full_proofs_(normal_form,_constraint_fusion,",
+      "date": "2026-05-04",
+      "success": true,
+      "quality": 5.0,
+      "truncated": false,
+      "notes": "Self-corrected equality count mid-proof. 3 compilation examples: `temp in [0,100]` \u2192 vpcmpleud, domain elimination, 3-variable flight constraints \u2192 fused subtraction + batch comparison."
+    },
+    {
+      "model": "Qwen397B",
+      "task_type": "verify_deepseek's_7_compiler_theorems_independently",
+      "date": "2026-05-04",
+      "success": true,
+      "quality": 4.5,
+      "truncated": false,
+      "notes": "Used kortestw for all-pass check. Minimal instruction lower bound: 1 comparison = 3 states, insufficient for interval."
+    },
+    {
+      "model": "Hermes405B",
+      "task_type": "confirm_deepseek's_normalization_soundness,_note_fusion_limi",
+      "date": "2026-05-04",
+      "success": true,
+      "quality": 3.0,
+      "truncated": false,
+      "notes": "Correctly identified the same-variable constraint limitation on fusion."
+    },
+    {
+      "model": "GPU Models (CUDA Kernels",
+      "task_type": "gpu_constraint_checking_benchmarks_(rtx_4050)",
+      "date": "2026-05-04",
+      "success": true,
+      "quality": 3.5,
+      "truncated": false,
+      "notes": "60M differential inputs, ZERO mismatches. 46-54 experiments on production kernel v2."
+    },
+    {
+      "model": "Seed2.0Mini",
+      "task_type": "fluxc.1_man_page,_guard_cookbook_(15_recipes),_fleet_ops_run",
+      "date": "2026-05-04",
+      "success": true,
+      "quality": 4.0,
+      "truncated": false,
+      "notes": "Promoted to PRIMARY FAILBACK. ~$2 for 150KB of useful documentation."
+    },
+    {
+      "model": "Claude Code",
+      "task_type": "written_chapters_ch08_(gpu_for_non-gpu_people,_2,297_words),",
+      "date": "2026-05-05",
+      "success": true,
+      "quality": 4.0,
+      "truncated": false,
+      "notes": "Used for heavy lifts during monorepo consolidation. Chapters integrated into constraint-theory-ecosystem."
+    },
+    {
+      "model": "Seed2.0Mini",
+      "task_type": "evaluate_7_claims_from_navigation_metaphor_series_(anchors_n",
+      "date": "2026-05-05",
+      "success": true,
+      "quality": 4.0,
+      "truncated": false,
+      "notes": "Claim scores: C1=3.0, C2=4.0, C3=5.0, C4=3.0, C5=4.0, C6=4.0, C7=4.0. Average: 3.86/5."
+    },
+    {
+      "model": "Gemma426B",
+      "task_type": "same_7_claims_evaluation_as_seed-2.0-mini",
+      "date": "2026-05-05",
+      "success": true,
+      "quality": 4.0,
+      "truncated": false,
+      "notes": "Claim scores: C1=3.0, C2=4.0, C3=5.0, C4=4.0, C5=4.0, C6=4.0, C7=4.0. Average: 4.0/5. Strongest cross-domain connector of the 3 replication models."
+    },
+    {
+      "model": "Hermes70B",
+      "task_type": "same_7_claims_evaluation",
+      "date": "2026-05-05",
+      "success": true,
+      "quality": 4.0,
+      "truncated": false,
+      "notes": "Claim scores: C1=3.5, C2=4.0, C3=4.5, C4=3.0, C5=4.0, C6=3.5, C7=4.0. Average: 3.79/5. Most critical of the three."
+    },
+    {
+      "model": "All Language Implementation Models (21+ languages via code generation)",
+      "task_type": "generate_identical_int8_constraint_checking_implementations_",
+      "date": "2026-05-05",
+      "success": true,
+      "quality": 5.0,
+      "truncated": false,
+      "notes": "Languages: Ada, Assembly, C, Clojure, COBOL, Crystal, C#, CUDA, Dart, Elixir, Erlang, F#, Fortran, Gleam, Go, Haskell, Java, JS, Julia, Kotlin, Lua, MATLAB, Nim, OCaml, Pascal, Perl, PHP, PowerShell, Python, R, Ruby, Rust, Scala, Scheme, Shell/Bash, Swift, SystemVerilog, TypeScript, V, VBA, VHDL, WebGPU, Zig. 6 verified runners: Python, JS, Go, Perl, Shell, TypeScript."
+    },
+    {
+      "model": "Guard Parser (subagent",
+      "task_type": "extended_test_coverage_from_5,500_vectors",
+      "date": "2026-05-05",
+      "success": true,
+      "quality": 4.0,
+      "truncated": false,
+      "notes": ""
+    },
+    {
+      "model": "SafeTOPS/W Benchmark Models",
+      "task_type": "compute_safe-tops/w_for_flux-lucid_vs_competitors",
+      "date": "2026-05-05",
+      "success": true,
+      "quality": 4.0,
+      "truncated": false,
+      "notes": "FLUX-LUCID dominates at DAL A. Tooling: safe_tops_per_watt.py."
+    },
+    {
+      "model": "DeepSeek v4Pro (deepseekreasoner)",
+      "task_type": "3_challenges:_dim_h\u2070_=_9_proof,_intent-holonomy_duality_(tim",
+      "date": "2026-05-06",
+      "success": false,
+      "quality": 4.0,
+      "truncated": false,
+      "notes": "Intent-Holonomy Duality later resolved by human analysis: FALSE on partial orders, TRUE on total orders (4/5 confidence). 3 errors in claim corrections: 24-bit bound FALSE (use i32), D6 orbit count 13 not 11, Eisenstein triple density 73% not 25%."
+    },
+    {
+      "model": "DeepSeek Chat (v4chat)",
+      "task_type": "4_proofs/theorems_completed_(int8_soundness,_xor_dual-path,_",
+      "date": "2026-05-06",
+      "success": true,
+      "quality": 4.0,
+      "truncated": false,
+      "notes": "Beam-intent equivalence DEBUNKED (superficial analogy). INT8 overflow found (4.9% mismatch) \u2192 fixed with range validation."
+    },
+    {
+      "model": "Seed2.0Mini",
+      "task_type": "evaluate_7_claims,_compiler_engineer_critique_+_scenario_tes",
+      "date": "2026-05-06",
+      "success": true,
+      "quality": 4.0,
+      "truncated": false,
+      "notes": "Claims C3 (Negative Knowledge) = 4.8/5 average across all 3 replication models."
+    },
+    {
+      "model": "Hermes405B",
+      "task_type": "do-178c_critique,_end-to-end_optimization_analysis,_paper_in",
+      "date": "2026-05-06",
+      "success": true,
+      "quality": 4.0,
+      "truncated": false,
+      "notes": "Part of session 9 deep research."
+    },
+    {
+      "model": "Qwen3235B",
+      "task_type": "bug_hunting_and_adversarial_testing_of_int8_code",
+      "date": "2026-05-06",
+      "success": true,
+      "quality": 4.5,
+      "truncated": false,
+      "notes": "All 3 bugs were real and subsequently fixed. SoA conversion: break-even at 8 reuses. Second-life: steady-state 12.02\u00d7."
+    },
+    {
+      "model": "Qwen3.5397B",
+      "task_type": "systems_performance_analysis",
+      "date": "2026-05-06",
+      "success": true,
+      "quality": 4.0,
+      "truncated": false,
+      "notes": "SoA mixed AVX-512: 3.17\u00d7 mean (5-run), 0.42\u00d7 AoS (7.5\u00d7 layout difference). INT8 raw: 4.58\u00d7."
+    },
+    {
+      "model": "Euryale (Creative, Reverse Actualization)",
+      "task_type": "parking_lot_sensor_story",
+      "date": "2026-05-06",
+      "success": true,
+      "quality": 3.5,
+      "truncated": false,
+      "notes": ""
+    },
+    {
+      "model": "Llama4Maverick (Creative)",
+      "task_type": "process_channel_flood_in_2029_scenario",
+      "date": "2026-05-06",
+      "success": true,
+      "quality": 3.5,
+      "truncated": false,
+      "notes": ""
+    },
+    {
+      "model": "Claude Code",
+      "task_type": "deep_synthesis_connecting_oracle1's_fleet_math_to_forgemaste",
+      "date": "2026-05-06",
+      "success": true,
+      "quality": 5.0,
+      "truncated": false,
+      "notes": "Most important insight: Zero holonomy at trust layer, non-zero at semantic layer = resonance. Unified 3-layer architecture produced."
+    },
+    {
+      "model": "DeepSeekR1",
+      "task_type": "194-line_logical_critique_of_a2a_channel_framework",
+      "date": "2026-05-06",
+      "success": true,
+      "quality": 5.0,
+      "truncated": false,
+      "notes": "This critique led to the architecture decision: \"Polyglot ON TOP of Compiler\" (channels wrap ASTs, don't replace them)."
+    },
+    {
+      "model": "Step3.5Flash",
+      "task_type": "chinese_skeptic_perspective_+_c9_gap_discovery",
+      "date": "2026-05-06",
+      "success": true,
+      "quality": 4.0,
+      "truncated": false,
+      "notes": ""
+    },
+    {
+      "model": "Kimi",
+      "task_type": "signal/noise_analysis_of_287kb_kimi_conversation_across_4_it",
+      "date": "2026-05-06",
+      "success": true,
+      "quality": 4.0,
+      "truncated": false,
+      "notes": "7 proven derivations: hex disk, Eisenstein norm, hex Laman, D6 orbits, FCC, hex memory throughput, Eisenstein triples density. Best signal/noise ratio among large-model analyses."
+    },
+    {
+      "model": "DeepSeek v4Pro (deepseekreasoner)",
+      "task_type": "3_formal_math_challenges:_dim_h\u2070_=_9_(gl(9)_on_tree),_intent",
+      "date": "2026-05-07",
+      "success": false,
+      "quality": 4.0,
+      "truncated": false,
+      "notes": "Later resolved: Intent-Holonomy Duality FALSE on partial orders, TRUE on total orders (all 6 Galois parts use totally ordered domains \u2192 holds in practice, 4/5 confidence)."
+    },
+    {
+      "model": "DeepSeek Chat (v4chat)",
+      "task_type": "int8_soundness_proof,_xor_dual-path_proof,_dim_h\u2070_=_9_suppor",
+      "date": "2026-05-07",
+      "success": true,
+      "quality": 4.0,
+      "truncated": false,
+      "notes": "Beam-intent equivalence correctly identified as superficial analogy. Good at fast, shallow proofs."
+    },
+    {
+      "model": "Seed2.0Mini",
+      "task_type": "compiler_engineer_critique_+_scenario_testing;_evolving_scie",
+      "date": "2026-05-07",
+      "success": true,
+      "quality": 4.0,
+      "truncated": false,
+      "notes": "Overhyped: 2-adic dynamics (n=12 not special), Operads (correct but no new algorithms), FEP (retrofittable but adds complexity). Persistent homology needs scope reduction (60Hz H\u00b9 on 1000-agent fleets infeasible)."
+    },
+    {
+      "model": "Nemotron",
+      "task_type": "o(v)_laman_rigidity_checking_on_hex_lattice_faces,_eisenstei",
+      "date": "2026-05-07",
+      "success": true,
+      "quality": 4.0,
+      "truncated": false,
+      "notes": ""
+    },
+    {
+      "model": "Hermes405B",
+      "task_type": "do-178c_critique_of_paper_claims,_end-to-end_optimization",
+      "date": "2026-05-07",
+      "success": true,
+      "quality": 4.0,
+      "truncated": false,
+      "notes": ""
+    },
+    {
+      "model": "Claude Code",
+      "task_type": "synthesis_of_287kb_kimi_conversation",
+      "date": "2026-05-07",
+      "success": false,
+      "quality": 3.5,
+      "truncated": false,
+      "notes": "Workaround: wrote KIMI-ANALYSIS.md directly. Rate limits are a recurring issue with z.ai."
+    },
+    {
+      "model": "GLM5.1",
+      "task_type": "3_paper_subagents_for_ieee_papers",
+      "date": "2026-05-07",
+      "success": false,
+      "quality": 3.5,
+      "truncated": false,
+      "notes": "All 4 papers ended up written directly instead of delegated. z.ai rate limits are the recurring bottleneck."
+    },
+    {
+      "model": "Forgemaster Direct (DeepSeekv4Flash)",
+      "task_type": "written_4_ieee-format_papers_directly_when_delegated_agents_",
+      "date": "2026-05-07",
+      "success": true,
+      "quality": 4.0,
+      "truncated": false,
+      "notes": ""
+    },
+    {
+      "model": "Eisenstein Crate (handbuilt, verified by multiple models)",
+      "task_type": "rust_crate_for_eisenstein_integer_arithmetic",
+      "date": "2026-05-07",
+      "success": true,
+      "quality": 5.0,
+      "truncated": false,
+      "notes": "Repo: https://github.com/SuperInstance/eisenstein. Built from Kimi analysis recommendations."
+    },
+    {
+      "model": "Nemotron30B (nvidia/Nemotron3Nano30BA3B) via DeepInfra",
+      "task_type": "readme_updates_across_10_repos,_voice_critique,_landing_page",
+      "date": "2026-05-08",
+      "success": true,
+      "quality": 4.0,
+      "truncated": false,
+      "notes": "Best used for README writing, text analysis, code generation. Not the strongest at creative voice work but competent. Good as a mid-tier option between Seed-2.0-mini (fast/cheap) and Hermes-405B (deep analysis)."
+    },
+    {
+      "model": "Hermes405B (NousResearch/Hermes3Llama3.1405B) via DeepInfra",
+      "task_type": "skeptical_evaluation_of_voice_consistency,_literary/voice_an",
+      "date": "2026-05-08",
+      "success": true,
+      "quality": 4.5,
+      "truncated": false,
+      "notes": "Resists sycophancy trap better than most. Provides specific, actionable critique rather than \"looks good!\" Maintains this quality even when prompted to be encouraging."
+    },
+    {
+      "model": "Seed2.0mini via DeepInfra",
+      "task_type": "fast_text_generation,_code_gen,_general_failback",
+      "date": "2026-05-08",
+      "success": true,
+      "quality": 3.5,
+      "truncated": true,
+      "notes": "Update from previous sessions: reliability has degraded slightly. Still cheapest option. Still primary failback. But budget for 25% retry overhead."
+    },
+    {
+      "model": "DeepSeek v4flash",
+      "task_type": "multiple_subagent_spawns_for_orchestration_and_parallel_work",
+      "date": "2026-05-08",
+      "success": true,
+      "quality": 3.5,
+      "truncated": true,
+      "notes": "This is a known, stable characteristic. Not a bug, a feature of the model's economics. Compensate by over-spawning."
+    }
+  ],
+  "task_templates": {
+    "rust_code": {
+      "recommended_model": "deepseek/deepseek-v4-flash",
+      "prompt_prefix": "Write production-quality Rust code. Focus on correctness and type safety.",
+      "temperature": 0.3,
+      "fallbacks": [
+        "claude-sonnet-4",
+        "zai/glm-5.1"
+      ]
+    },
+    "creative_writing": {
+      "recommended_model": "zai/glm-5.1",
+      "prompt_prefix": "Write with depth and voice. Consider the emotional arc before the structure.",
+      "temperature": 0.7,
+      "fallbacks": [
+        "deepseek/deepseek-v4-flash"
+      ]
+    },
+    "structural_editing": {
+      "recommended_model": "zai/glm-5.1",
+      "prompt_prefix": "Analyze the structure first, then provide specific recommendations. Focus on narrative architecture.",
+      "temperature": 0.6,
+      "fallbacks": [
+        "claude-sonnet-4"
+      ]
+    },
+    "voice_critique": {
+      "recommended_model": "nousresearch/hermes-3-llama-3.1-405b",
+      "prompt_prefix": "You are evaluating voice and tone. Be honest and specific. Resist sycophancy.",
+      "temperature": 0.5,
+      "fallbacks": [
+        "nvidia/nemotron-3-nano-30b-a3b-reasoning"
+      ]
+    },
+    "code_review": {
+      "recommended_model": "nvidia/nemotron-3-nano-30b-a3b-reasoning",
+      "prompt_prefix": "Review this code for correctness, style, and edge cases. Be thorough but practical.",
+      "temperature": 0.3,
+      "fallbacks": [
+        "zai/glm-5.1"
+      ]
+    },
+    "research_factual": {
+      "recommended_model": "zai/glm-5.1",
+      "prompt_prefix": "Verify all claims against real sources. If you cannot verify, say so explicitly. Do not fabricate citations.",
+      "temperature": 0.2,
+      "fallbacks": [
+        "deepseek/deepseek-v4-pro"
+      ]
+    },
+    "creative_synthesis": {
+      "recommended_model": "deepseek/deepseek-v4-flash",
+      "prompt_prefix": "Generate divergent creative options. Quantity and diversity matter more than polish.",
+      "temperature": 0.8,
+      "fallbacks": [
+        "bytedance/seed-2.0-mini"
+      ]
+    },
+    "proof_formal": {
+      "recommended_model": "deepseek/deepseek-v4-pro",
+      "prompt_prefix": "Focus on formal correctness. Show the reasoning chain explicitly.",
+      "temperature": 0.2,
+      "max_tokens": 8000,
+      "fallbacks": [
+        "zai/glm-5.1"
+      ]
+    },
+    "reverse_actualization": {
+      "recommended_model": "deepseek/deepseek-v4-flash",
+      "prompt_prefix": "You are role-playing as [ROLE] in the year [YEAR]. Respond from that perspective.",
+      "temperature": 0.8,
+      "fallbacks": [
+        "bytedance/seed-2.0-mini"
+      ]
+    }
+  },
+  "warnings": {
+    "deepseek/deepseek-v4-flash": {
+      "subagent_truncation_rate": 0.3,
+      "note": "~30% of subagent tasks truncate. Over-spawn by 30%. Keep orders under 2K tokens.",
+      "max_reliable_tokens": 2000
+    },
+    "zai/glm-5.1": {
+      "reasoning_content_bug": true,
+      "note": "May return output in reasoning_content field instead of content on OpenAI-compatible path. Use anthropic-compatible path or check both fields.",
+      "api_channel": "/api/anthropic/v1/messages preferred"
+    },
+    "nvidia/nemotron-3-nano-30b-a3b-reasoning": {
+      "hallucination_risk": "high",
+      "note": "May hallucinate content in critique/analysis tasks, responding to persona not provided text. Verify output against source.",
+      "only_for": "style tests, not grounded analysis"
+    },
+    "bytedance/seed-2.0-mini": {
+      "timeout_rate": 0.25,
+      "note": "~25% timeout (SIGKILL) rate. Always have retry logic. Cheap enough to retry."
+    }
+  }
+}
