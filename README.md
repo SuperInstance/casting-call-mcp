@@ -1,5 +1,15 @@
 # Casting-Call MCP ⚓
 
+
+## Meta
+
+**Domain:** other
+**Depends on:** —
+**Depended by:** —
+**Implements:** MCP server: consultative database for model casting decisions — choose the right...
+**Related:** —
+
+
 **A consultative database that agents use to choose the right model for the right task.**
 
 Every voyage needs different hands. This MCP server tells you who to board, at what temperature, and with what prompt prefix — backed by real evaluation data that grows with every task.
