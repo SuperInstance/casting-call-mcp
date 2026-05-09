@@ -1,0 +1,12 @@
+{
+  "version": 1,
+  "default_trust": 0.5,
+  "task_defaults": {},
+  "contributors": {
+    "oracle1@fleet": {
+      "global_trust": 0.85,
+      "source": "user",
+      "notes": ""
+    }
+  }
+}
