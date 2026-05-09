@@ -7,6 +7,14 @@
       "global_trust": 0.85,
       "source": "user",
       "notes": ""
+    },
+    "forgemaster@fleet": {
+      "global_trust": 0.5,
+      "source": "user",
+      "notes": "",
+      "task_trust": {
+        "rust_code": 1
+      }
     }
   }
 }
