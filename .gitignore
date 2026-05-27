@@ -3,3 +3,6 @@
 .env
 node_modules/
 data/cast-log.lock
+__pycache__/
+*.pyc
+*.pyo

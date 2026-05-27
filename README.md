@@ -513,3 +513,65 @@ MIT
 ---
 
 *Fair winds. Bring back what you find.*
+
+---
+
+## Python Package
+
+The `casting_call_mcp` Python package provides a native implementation of the casting-call system with no external dependencies beyond `pytest` for testing.
+
+### Installation
+
+```bash
+pip install -e .
+# or with dev dependencies:
+pip install -e ".[dev]"
+```
+
+### Quick Start
+
+```python
+from casting_call_mcp import MCPServer
+from casting_call_mcp.cast import CastCall
+from casting_call_mcp.role import Actor, Role, ModelCapability
+from casting_call_mcp.audition import Audition
+from casting_call_mcp.schedule import ScheduleManager, TaskPriority
+
+# Query for the best model
+server = MCPServer()
+result = server.call_tool("cast_model", {"task_description": "implement a sorting algorithm"})
+print(result["recommended_model"])  # e.g., "GPT-4"
+
+# Log a result
+server.call_tool("log_result", {
+    "model": "GPT-4",
+    "task_type": "code_generation",
+    "success": True,
+    "quality": 5,
+})
+
+# Run an audition	rust_weights = {"alice": 1.0, "bob": 0.5}
+audition = Audition(evaluations, trust_weights=trust_weights)
+report = audition.run(task_type="code_generation")
+print(report.winner.candidate_name)  # Best model
+
+# Schedule tasks
+sm = ScheduleManager(max_concurrent_per_model=3)
+task = sm.schedule("code_review", "Claude", priority=TaskPriority.HIGH)
+```
+
+### Architecture
+
+| Module | Purpose |
+|---|---|
+| `server.py` | MCP server with tool definitions for model casting |
+| `cast.py` | `CastCall` — define work requirements and match evaluations |
+| `role.py` | `Actor` / `Role` — match models to capabilities |
+| `audition.py` | `Audition` — score and rank candidates with trust weighting |
+| `schedule.py` | `ScheduleManager` — workload scheduling with conflict resolution |
+
+### Running Tests
+
+```bash
+python3 -m pytest tests/ -q
+```
